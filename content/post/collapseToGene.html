@@ -1,0 +1,268 @@
+---
+title: "collapseToGene"
+author: "Jessica L. Woolnough"
+output:
+  blogdown::html_page:
+    toc: true
+  date: "16 October, 2018"
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#step-by-step">Step-by-step</a><ul>
+<li><a href="#download-refseq-coordinate-file">Download RefSeq coordinate file</a></li>
+<li><a href="#unzip-file">Unzip file</a></li>
+<li><a href="#manipulate-to-bed-format">Manipulate to bed format</a></li>
+<li><a href="#create-list-of-chromosomes-of-interest">Create list of chromosomes of interest</a></li>
+<li><a href="#select-chromosomes-of-interest">Select chromosomes of interest</a></li>
+<li><a href="#create-a-unique-identifier-based-on-gene-length">Create a unique identifier based on gene length</a></li>
+<li><a href="#select-annotation-with-longest-transcribed-sequence">Select annotation with longest transcribed sequence</a></li>
+<li><a href="#join-files-based-on-unique-identifier">Join files based on unique identifier</a></li>
+<li><a href="#check-that-only-one-line-per-gene-name">check that only one line per gene name</a></li>
+</ul></li>
+<li><a href="#streamlined-code">Streamlined code</a></li>
+</ul>
+</div>
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<div class="figure">
+<img src="/post/collapseToGene_files/collapseToGene.png" />
+
+</div>
+<p>This script collapses a list containing multiple transcript coordinates per ‘gene’ to a list with a single line entry per unique TSS (default outputs longest transcript, but can be modified for desired feature).</p>
+<ul>
+<li><strong>Step-by-step:</strong> full instructions with “Steps” (i.e. “plain english” explanations of code) and “Code” (actual code being executed)<br />
+</li>
+<li><strong>Streamlined code:</strong> continuous code without detailed explanations. Be careful! Try “step-by-step” first.</li>
+</ul>
+<p><em>Note: uses Linux/UNIX commands and <a href="https://bedtools.readthedocs.io/en/latest/">bedtools</a></em></p>
+</div>
+<div id="step-by-step" class="section level1">
+<h1>Step-by-step</h1>
+<div id="download-refseq-coordinate-file" class="section level2">
+<h2>Download RefSeq coordinate file</h2>
+<p>Using UCSC GoldenPath database, download the ‘ncbiRefSeq.txt.gz’ gene coordinate file</p>
+<pre class="bash"><code>wget ftp://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/ncbiRefSeq.txt.gz</code></pre>
+</div>
+<div id="unzip-file" class="section level2">
+<h2>Unzip file</h2>
+<pre class="bash"><code>gunzip ncbiRefSeq.txt.gz</code></pre>
+</div>
+<div id="manipulate-to-bed-format" class="section level2">
+<h2>Manipulate to bed format</h2>
+<p>Final order of columns should be: chr, start, end, refseq_id, refseq_id, strand</p>
+<p>Steps:<br />
+1. print tab-delimiteds columns 3,5,6,13,13,4<br />
+2. sort starting and ending on column 4<br />
+3. output unique lines only<br />
+4. save to file</p>
+<p>Code:</p>
+<pre class="bash"><code>awk &#39;{OFS=&quot;\t&quot;}{print $3,$5,$6,$13,$13,$4}&#39; ncbiRefSeq.txt | \
+sort -k 4,4 | \
+uniq &gt; ncbiRefSeq.bed </code></pre>
+</div>
+<div id="create-list-of-chromosomes-of-interest" class="section level2">
+<h2>Create list of chromosomes of interest</h2>
+<p>Create a newline separated list of the chromosome names of interest. Often non-standard chromosomes are included in these gene lists and can lead to redundancy. You can create this list however you like. Here is one way to do it.</p>
+<p>Steps:<br />
+1. print comma-separated list of chromosome names of interest<br />
+2. replace commas with newlines<br />
+3. save to file</p>
+<p>Code:</p>
+<pre class="bash"><code>printf &quot;chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY&quot; | \
+sed &#39;s/,/\n/g&#39; &gt; chr_list.txt</code></pre>
+</div>
+<div id="select-chromosomes-of-interest" class="section level2">
+<h2>Select chromosomes of interest</h2>
+<p>Steps:<br />
+1. read in chr_list.txt to a while loop<br />
+2. read each line<br />
+3. In the loop, call what is read from the line as variable ‘f’<br />
+4. In the loop, select lines that word match ‘f’ in ncbiRefSeq.bed and save as .tmp file<br />
+5. concatenate all .tmp files in the directory and save as ncbiRefSeq.chr.bed<br />
+6. remove all .tmp files in the directory</p>
+<p>Code:</p>
+<pre class="bash"><code>cat chr_list.txt | while ((i++));
+read -r line
+do
+        f=${line%%.*};
+        grep -w ${f} ncbiRefSeq.bed &gt; ${f}.tmp
+
+done
+
+cat *.tmp &gt; ncbiRefSeq.chr.bed
+rm *.tmp</code></pre>
+</div>
+<div id="create-a-unique-identifier-based-on-gene-length" class="section level2">
+<h2>Create a unique identifier based on gene length</h2>
+<p>Calculate the length of each gene and then join gene name and gene length to create a unique identifier.</p>
+<p>Steps:<br />
+1. print tab-delimited all columns then column 3 minus column 2<br />
+2. print tab-delimited all columns then column 4 pasted to ’_’ pasted to column 7<br />
+3. sort starting and ending with column 4<br />
+4. save to file</p>
+<p>Code:</p>
+<pre class="bash"><code>awk &#39;{OFS=&quot;\t&quot;}{print $0,$3-$2}&#39; ncbiRefSeq.chr.bed | \
+awk &#39;{OFS=&quot;\t&quot;}{print $0,$4&quot;_&quot;$7}&#39; | \
+sort -k 4,4 &gt; ncbiRefSeq.id.bed</code></pre>
+</div>
+<div id="select-annotation-with-longest-transcribed-sequence" class="section level2">
+<h2>Select annotation with longest transcribed sequence</h2>
+<p>First check that your code will only leave unique gene names.</p>
+<p>Steps:<br />
+1. On ncbiRefSeq.id.bed group by column 4 and operate on column 7 by selecting maximum number<br />
+2. print column 1<br />
+3. output non-unique lines<br />
+4. count outputted lines</p>
+<p>The output of this should be 0. If not, the newly created identifiers are not unique.</p>
+<p>Code:</p>
+<pre class="bash"><code>## this should output 0
+bedtools groupby -i ncbiRefSeq.id.bed -g 4 -c 7 -o max | \
+awk &#39;{print $1}&#39; | \
+uniq -d | \
+wc -l</code></pre>
+<pre><code>## 0</code></pre>
+<p>Select annotation with longest transcribed sequence.</p>
+<p>Steps:<br />
+1. On ncbiRefSeq.id.bed group by column 4 and operate on column 7 by selecting maximum number<br />
+2. print tab-delimited column 1 pasted to ’_’ pasted to column 2, column 1, column 2<br />
+3. sort starting and ending on column 1<br />
+4. save to file</p>
+<p>Code:</p>
+<pre class="bash"><code>bedtools groupby -i ncbiRefSeq.id.bed -g 4 -c 7 -o max | \
+awk &#39;{OFS=&quot;\t&quot;}{print $1&quot;_&quot;$2,$1,$2}&#39; | \
+sort -k 1,1 &gt; ncbiRefSeq.longest.bed</code></pre>
+<p>Sort ncbiRefSeq.id.bed starting and ending with column 8</p>
+<pre class="bash"><code>sort -k 8,8 ncbiRefSeq.id.bed &gt; tmp
+mv tmp ncbiRefSeq.id.bed</code></pre>
+</div>
+<div id="join-files-based-on-unique-identifier" class="section level2">
+<h2>Join files based on unique identifier</h2>
+<p>Join the ncbiRefSeq.longest.bed with the ncbiRefSeq.id.bed based on unique identifier. Also, make new identifier that contains all the information from the line, put in column 5</p>
+<p>First check code to make sure all new IDs created are unique.</p>
+<p>Steps:<br />
+1. join ncbiRefSeq.id.bed based on column 8 with ncbiRefSeq.longest.bed based on column 1<br />
+2. print tab-delimited column 2,3,4,5,1’<em>‘2’</em>‘3’<em>‘4’</em>‘5’<em>‘6’</em>’7,7<br />
+3. print column 5<br />
+4. output non-unique lines<br />
+5. count lines</p>
+<p>This should output to 0.</p>
+<p>Code:</p>
+<pre class="bash"><code>## this should output 0
+join -1 8 -2 1 ncbiRefSeq.id.bed ncbiRefSeq.longest.bed | \
+awk &#39;{OFS=&quot;\t&quot;}{print $2,$3,$4,$5,$1&quot;_&quot;$2&quot;_&quot;$3&quot;_&quot;$4&quot;_&quot;$7,$7}&#39; | \
+awk &#39;{print $5}&#39; | \
+uniq -d | \
+wc -l</code></pre>
+<pre><code>## 0</code></pre>
+<p>Run code and creat gene file:</p>
+<pre class="bash"><code>join -1 8 -2 1 ncbiRefSeq.id.bed ncbiRefSeq.longest.bed | \
+awk &#39;{OFS=&quot;\t&quot;}{print $2,$3,$4,$5,$1&quot;_&quot;$2&quot;_&quot;$3&quot;_&quot;$4&quot;_&quot;$7,$7}&#39; | \
+sort -k 1,1 &gt; gene.ncbiRefSeq.longest.bed</code></pre>
+</div>
+<div id="check-that-only-one-line-per-gene-name" class="section level2">
+<h2>check that only one line per gene name</h2>
+<pre class="bash"><code>awk &#39;{print $4}&#39; gene.ncbiRefSeq.longest.bed | \
+uniq -d | \
+wc -l</code></pre>
+<pre><code>## 1</code></pre>
+<p>Note: for hg19, only one gene has two lines and this is because the two annotations have different start and end coordinates but are both the same length. To avoid this, change the parameters in the bedtools groupby step to eliminate ‘ties’ like this.</p>
+</div>
+</div>
+<div id="streamlined-code" class="section level1">
+<h1>Streamlined code</h1>
+<pre class="bash"><code>### Execute in Bash shell
+echo &quot;Begin script...&quot;
+
+### Download RefSeq coordinate file
+wget ftp://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/ncbiRefSeq.txt.gz
+
+### unzip file
+gunzip ncbiRefSeq.txt.gz
+
+## count lines in file
+echo &quot;Number of lines in start file:&quot;
+cat ncbiRefSeq.txt | wc -l
+
+### Manipulate to bed format
+
+awk &#39;{OFS=&quot;\t&quot;}{print $3,$5,$6,$13,$13,$4}&#39; ncbiRefSeq.txt | \
+sort -k 4,4 | \
+uniq &gt; ncbiRefSeq.bed 
+
+### Create list of chromosomes of interest
+printf &quot;chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY&quot; | \
+sed &#39;s/,/\n/g&#39; &gt; chr_list.txt
+
+### Select chromosomes of interest
+
+cat chr_list.txt | while ((i++));
+read -r line
+do
+        f=${line%%.*};
+        grep -w ${f} ncbiRefSeq.bed &gt; ${f}.tmp
+
+done
+
+cat *.tmp &gt; ncbiRefSeq.chr.bed
+rm *.tmp
+
+### Create a unique identifier based on gene length
+
+awk &#39;{OFS=&quot;\t&quot;}{print $0,$3-$2}&#39; ncbiRefSeq.chr.bed | \
+awk &#39;{OFS=&quot;\t&quot;}{print $0,$4&quot;_&quot;$7}&#39; | \
+sort -k 4,4 &gt; ncbiRefSeq.id.bed
+
+### Select annotation with longest transcribed sequence
+
+## this should output 0
+
+echo &quot;This should output 0&quot;
+bedtools groupby -i ncbiRefSeq.id.bed -g 4 -c 7 -o max | \
+awk &#39;{print $1}&#39; | \
+uniq -d | \
+wc -l
+
+### run code
+bedtools groupby -i ncbiRefSeq.id.bed -g 4 -c 7 -o max | \
+awk &#39;{OFS=&quot;\t&quot;}{print $1&quot;_&quot;$2,$1,$2}&#39; | \
+sort -k 1,1 &gt; ncbiRefSeq.longest.bed
+  
+### Sort ncbiRefSeq.id.bed starting and ending with column 8  
+sort -k 8,8 ncbiRefSeq.id.bed &gt; tmp
+mv tmp ncbiRefSeq.id.bed
+  
+### Join files based on unique identifier
+## this should output 0
+
+
+echo &quot;This should output 0&quot;
+join -1 8 -2 1 ncbiRefSeq.id.bed ncbiRefSeq.longest.bed | \
+awk &#39;{OFS=&quot;\t&quot;}{print $2,$3,$4,$5,$1&quot;_&quot;$2&quot;_&quot;$3&quot;_&quot;$4&quot;_&quot;$7,$7}&#39; | \
+awk &#39;{print $5}&#39; | \
+uniq -d | \
+wc -l
+
+### Run code and create gene file
+
+join -1 8 -2 1 ncbiRefSeq.id.bed ncbiRefSeq.longest.bed | \
+awk &#39;{OFS=&quot;\t&quot;}{print $2,$3,$4,$5,$1&quot;_&quot;$2&quot;_&quot;$3&quot;_&quot;$4&quot;_&quot;$7,$7}&#39; | \
+sort -k 1,1 &gt; gene.ncbiRefSeq.longest.bed
+
+## counts number of lines in ending file
+echo &quot;Number of lines in end file:&quot;
+cat gene.ncbiRefSeq.longest.bed | wc -l
+
+### check that only one line per gene name
+
+echo &quot;This outputs number of non-unique gene names. See notes:&quot;
+awk &#39;{print $4}&#39; gene.ncbiRefSeq.longest.bed | \
+uniq -d | \
+wc -l
+
+echo &quot;End of script&quot;
+### Note: for hg19, only one gene has two lines and this is because the two annotations have different start and end coordinates but are both the same length. To avoid this, change the parameters in the bedtools groupby step to eliminate &#39;ties&#39; like this.</code></pre>
+</div>
