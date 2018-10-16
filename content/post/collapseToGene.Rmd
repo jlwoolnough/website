@@ -41,7 +41,7 @@ gunzip ncbiRefSeq.txt.gz
 Final order of columns should be: chr, start, end, refseq_id, refseq_id, strand  
   
 Steps:  
-1. print tab-delimiteds columns 3,5,6,13,13,4  
+1. print tab-delimited columns 3,5,6,13,13,4  
 2. sort starting and ending on column 4  
 3. output unique lines only  
 4. save to file  
@@ -175,7 +175,7 @@ uniq -d | \
 wc -l
 ```
 
-Run code and creat gene file:  
+Run code and create gene file:  
 ```{bash}
 join -1 8 -2 1 ncbiRefSeq.id.bed ncbiRefSeq.longest.bed | \
 awk '{OFS="\t"}{print $2,$3,$4,$5,$1"_"$2"_"$3"_"$4"_"$7,$7}' | \

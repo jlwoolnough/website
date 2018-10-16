@@ -55,7 +55,7 @@ output:
 <h2>Manipulate to bed format</h2>
 <p>Final order of columns should be: chr, start, end, refseq_id, refseq_id, strand</p>
 <p>Steps:<br />
-1. print tab-delimiteds columns 3,5,6,13,13,4<br />
+1. print tab-delimited columns 3,5,6,13,13,4<br />
 2. sort starting and ending on column 4<br />
 3. output unique lines only<br />
 4. save to file</p>
@@ -158,7 +158,7 @@ awk &#39;{print $5}&#39; | \
 uniq -d | \
 wc -l</code></pre>
 <pre><code>## 0</code></pre>
-<p>Run code and creat gene file:</p>
+<p>Run code and create gene file:</p>
 <pre class="bash"><code>join -1 8 -2 1 ncbiRefSeq.id.bed ncbiRefSeq.longest.bed | \
 awk &#39;{OFS=&quot;\t&quot;}{print $2,$3,$4,$5,$1&quot;_&quot;$2&quot;_&quot;$3&quot;_&quot;$4&quot;_&quot;$7,$7}&#39; | \
 sort -k 1,1 &gt; gene.ncbiRefSeq.longest.bed</code></pre>
