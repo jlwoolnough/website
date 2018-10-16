@@ -14,7 +14,7 @@ knitr::opts_knit$set(root.dir = '/home/jwoolnough/jess/working/')
 
 # Introduction
 
-![](/post/collapseToGene_files/collapseToGene.png)
+![](img/collapseToGene.png)
 
 This script collapses a list containing multiple transcript coordinates per 'gene' to a list with a single line entry per unique TSS (default outputs longest transcript, but can be modified for desired feature).  
   
