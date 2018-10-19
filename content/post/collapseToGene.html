@@ -3,15 +3,25 @@ title: "collapseToGene"
 author: "Jessica L. Woolnough"
 output:
   blogdown::html_page:
-    toc: true
-  date: "17 October, 2018"
+    toc: false
+  date: "19 October, 2018"
 ---
 
 
-<div id="TOC">
+
+<div id="this-script-collapses-a-list-with-multiple-transcripts-per-gene-to-a-list-with-only-a-single-entry-per-unique-tss.-this-is-useful-to-create-the-coordinate-file-needed-to-generate-heatmaps-or-metagene-plots-across-tsss-because-there-is-only-one-entry-per-tss." class="section level3">
+<h3>This script collapses a list with multiple transcripts per ‘gene’ to a list with only a single entry per unique TSS. This is useful to create the coordinate file needed to generate heatmaps or metagene plots across TSSs, because there is only one entry per TSS.</h3>
+<div class="figure">
+<img src="/img/collapseToGene.png" />
+
+</div>
+</div>
+<div id="table-of-contents" class="section level2">
+<h2>Table of Contents</h2>
 <ul>
 <li><a href="#introduction">Introduction</a></li>
-<li><a href="#step-by-step">Step-by-step</a><ul>
+<li><a href="#step-by-step">Step-by-step</a>
+<ul>
 <li><a href="#download-refseq-coordinate-file">Download RefSeq coordinate file</a></li>
 <li><a href="#unzip-file">Unzip file</a></li>
 <li><a href="#manipulate-to-bed-format">Manipulate to bed format</a></li>
@@ -20,12 +30,11 @@ output:
 <li><a href="#create-a-unique-identifier-based-on-gene-length">Create a unique identifier based on gene length</a></li>
 <li><a href="#select-annotation-with-longest-transcribed-sequence">Select annotation with longest transcribed sequence</a></li>
 <li><a href="#join-files-based-on-unique-identifier">Join files based on unique identifier</a></li>
-<li><a href="#check-that-only-one-line-per-gene-name">check that only one line per gene name</a></li>
+<li><a href="#check-that-only-one-line-per-gene-namenote:-for-hg19,-only-one-gene-has-two-lines-and-this-is-because-the-two-annotations-have-different-start-and-end-coordinates-but-are-both-the-same-length.-to-avoid-this,-change-the-parameters-in-the-bedtools-groupby-step-to-eliminate-&#39;ties&#39;-like-this.">check that only one line per gene nameNote: for hg19, only one gene has two lines and this is because the two annotations have different start and end coordinates but are both the same length. To avoid this, change the parameters in the bedtools groupby step to eliminate ‘ties’ like this.</a></li>
 </ul></li>
 <li><a href="#streamlined-code">Streamlined code</a></li>
 </ul>
 </div>
-
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
 <div class="figure">

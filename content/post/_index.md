@@ -1,6 +1,6 @@
 +++
 title = "Posts"
-
+subtitle = ""
 
 # List format.
 #   0 = Simple

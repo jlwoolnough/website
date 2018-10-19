@@ -6,7 +6,6 @@ active = true
 
 
 title = "Recent Posts"
-subtitle = ""
 
 # Order that this section will appear in.
 weight = 40

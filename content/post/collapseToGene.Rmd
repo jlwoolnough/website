@@ -3,14 +3,28 @@ title: "collapseToGene"
 author: "Jessica L. Woolnough"
 output:
   blogdown::html_page:
-    toc: true
+    toc: false
   date: "`r format(Sys.time(), '%d %B, %Y')`"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = '/home/jwoolnough/jess/working/')
+devtools::source_gist("c83e078bf8c81b035e32c3fc0cf04ee8", 
+                      filename = 'render_toc.R')
 ```
+
+### This script collapses a list with multiple transcripts per 'gene' to a list with only a single entry per unique TSS. This is useful to create the coordinate file needed to generate heatmaps or metagene plots across TSSs, because there is only one entry per TSS.  
+![](/img/collapseToGene.png)  
+
+
+
+## Table of Contents
+
+```{r toc, echo=FALSE}
+render_toc(filename = "/jess/GitHub/website/content/post/collapseToGene.Rmd")
+```
+
 
 # Introduction
 
