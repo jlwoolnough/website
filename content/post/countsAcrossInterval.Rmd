@@ -1,0 +1,170 @@
+---
+title: "enrichAcrossIntervals"
+author: "Jessica L. Woolnough"
+output:
+  blogdown::html_page:
+    toc: false
+  date: "`r format(Sys.time(), '%d %B, %Y')`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = '/home/jwoolnough/jess/tf_h64/')
+devtools::source_gist("c83e078bf8c81b035e32c3fc0cf04ee8", 
+                      filename = 'render_toc.R')
+```
+
+### This script assigns peak enrichments to any set of intervals. This is useful for summarizing peak data for many experiments across a single set of intervals, like TSSs.
+
+## Table of Contents
+
+```{r toc, echo=FALSE}
+render_toc(filename = "/jess/GitHub/website/content/post/countsAcrossInterval.Rmd")
+```
+
+# Introduction
+
+This script assigns peak enrichments to any set of intervals. This is useful for summarizing peak data for many experiments across a single set of intervals, like TSSs.
+  
+* Select peak enrichment files were downloaded from GEO Accession [GSE61475](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE61475)
+* Interval file contains coordinates of select enhancers in HUES64 cells
+
+_Note: uses Linux/UNIX commands and [bedtools](https://bedtools.readthedocs.io/en/latest/)_
+
+
+## Peak enrichment file example
+
+Columns are tab-delimited as follows:
+
+1. chr  
+2. peak start  
+3. peak end  
+4. peak number  
+5. peak enrichment  
+
+Example:
+```{bash,comment=NA}
+# print first 10 lines of a peak enrichment file
+head GSM1505751_Smad4_021113_h64.bed
+```
+
+## Interval file example
+
+Columns are tab-delimited as follows:
+
+1. chr  
+2. start  
+3. end  
+4. interval name  
+5. other descriptive info  
+6. strand  
+
+Example:
+```{bash,comment=NA}
+# print first 10 lines of interval file 
+head enh_hues64.bed
+```
+
+# enrichAcrossIntervals script
+```{bash, eval=FALSE}
+
+for  i in *.bed
+do
+        ## define variables
+        int_file=interval.bed
+        base=$(basename $i .bed)
+        
+        ## start script
+        echo "Starting countEnrichAcrossInterval"
+        
+        ## print file name being currently run
+        echo "$base"
+        
+        ## sort all bed files
+        sort -k1,1 -k2,2n $i > $base.sort.bed
+        
+        ## intersect peak enrichments with interval file outputting a and b file info
+        intersectBed -a $int_file -b $base.sort.bed -wa -wb > $base.int.bed
+        
+        ## for each interval (e.g. column 1-4), choose the peak enrichment (e.g. column 11) with the highest value
+        bedtools groupby -i $base.int.bed -g 1,2,3,4 -c 11 -o max | sed 's/ /\t/g' | sort -k1,1 -k2,2n > $base.group.bed
+        
+        ## intersect peak enrichments with interval file and print '0' for all intervals that don't intersect a peak
+        intersectBed -a $int_file -b $base.group.bed -wa -v | awk '{OFS="\t"}{print $1,$2,$3,$4,0}' > $base.not.bed
+        
+        ## concatenate the intervals overlapping peaks (e.g. $base.group.bed) with the intervals not overlapping peaks (e.g. $base.not.bed)
+        cat $base.group.bed $base.not.bed |sort -k4,4 > $base.enrich.bed
+        
+        ## save file name to be used later as header
+        echo  "$base" > $base.name
+        
+        ## print only the peak enrichment score (e.g. column 5) from $base.enrich.bed
+        awk '{OFS="\t"}{print $5}' $base.enrich.bed >$base.enrich
+        
+        ## concatenate the header (e.g. $base.name) with the enirchment score file (e.g. $base.enrich)
+        cat $base.name $base.enrich > $base.col
+        
+        ## remove intermediate files
+        rm $base.enrich
+        rm $base.enrich.bed
+        rm $base.group.bed
+        rm $base.int.bed
+        rm $base.name
+        rm $base.not.bed
+        
+        echo "Done."
+done
+
+```
+
+# Verifying script
+## Paste all enrich files together
+```{bash, eval=FALSE}
+paste *.col > master.col
+```
+
+## View output file
+```{bash,eval=FALSE}
+head master.col
+```
+
+
+## Load libraries for R
+```{r, message=FALSE}
+library(ggplot2)
+library(dplyr)
+library(corrplot)
+```
+
+## Read file into R
+```{r}
+dat <- read.table("/home/jwoolnough/jess/tf_h64/master.col", sep="\t",header=TRUE)
+```
+
+```{r,include=FALSE}
+dat$X <- NULL
+```
+
+## Plot correlation
+```{r}
+M <- cor(dat)
+
+colnames(M) <- c(1:54)
+rownames(M) <- c(1:54)
+
+corrplot(M, method="circle", order="hclust", tl.cex=0.6)
+
+```
+## Sample Key
+```{r,comment=NA}
+id <- as.data.frame(colnames(dat))
+names(id) <- c("Sample Key")
+
+id
+```
+
+
+
+```{r,include=FALSE}
+servr::daemon_stop("139717500734200")
+```

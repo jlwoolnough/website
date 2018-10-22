@@ -8,7 +8,7 @@ active = true
 title = "Recent Posts"
 
 # Order that this section will appear in.
-weight = 40
+weight = 10
 
 # Filter posts by tag.
 #  By default, show all recent posts.

@@ -1,0 +1,241 @@
+---
+title: "enrichAcrossIntervals"
+author: "Jessica L. Woolnough"
+output:
+  blogdown::html_page:
+    toc: false
+  date: "22 October, 2018"
+---
+
+
+
+<div id="this-script-assigns-peak-enrichments-to-any-set-of-intervals.-this-is-useful-for-summarizing-peak-data-for-many-experiments-across-a-single-set-of-intervals-like-tsss." class="section level3">
+<h3>This script assigns peak enrichments to any set of intervals. This is useful for summarizing peak data for many experiments across a single set of intervals, like TSSs.</h3>
+</div>
+<div id="table-of-contents" class="section level2">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#introduction">Introduction</a>
+<ul>
+<li><a href="#peak-enrichment-file-example">Peak enrichment file example</a></li>
+<li><a href="#interval-file-example">Interval file example</a></li>
+</ul></li>
+<li><a href="#enrichacrossintervals-script">enrichAcrossIntervals script</a></li>
+<li><a href="#verifying-script">Verifying script</a>
+<ul>
+<li><a href="#paste-all-enrich-files-together">Paste all enrich files together</a></li>
+<li><a href="#view-output-file">View output file</a></li>
+<li><a href="#load-libraries-for-r">Load libraries for R</a></li>
+<li><a href="#read-file-into-r">Read file into R</a></li>
+<li><a href="#plot-correlationsample-key">Plot correlationSample Key</a></li>
+</ul></li>
+</ul>
+</div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>This script assigns peak enrichments to any set of intervals. This is useful for summarizing peak data for many experiments across a single set of intervals, like TSSs.</p>
+<ul>
+<li>Select peak enrichment files were downloaded from GEO Accession <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE61475">GSE61475</a></li>
+<li>Interval file contains coordinates of select enhancers in HUES64 cells</li>
+</ul>
+<p><em>Note: uses Linux/UNIX commands and <a href="https://bedtools.readthedocs.io/en/latest/">bedtools</a></em></p>
+<div id="peak-enrichment-file-example" class="section level2">
+<h2>Peak enrichment file example</h2>
+<p>Columns are tab-delimited as follows:</p>
+<ol style="list-style-type: decimal">
+<li>chr<br />
+</li>
+<li>peak start<br />
+</li>
+<li>peak end<br />
+</li>
+<li>peak number<br />
+</li>
+<li>peak enrichment</li>
+</ol>
+<p>Example:</p>
+<pre class="bash"><code># print first 10 lines of a peak enrichment file
+head GSM1505751_Smad4_021113_h64.bed</code></pre>
+<pre><code>chr1    762755  762850  1   54.230000   
+chr1    856568  856664  2   53.360000   
+chr1    859689  859794  3   51.740000   
+chr1    876306  876420  4   75.150000   
+chr1    877023  877222  5   106.590000  
+chr1    877249  877538  6   170.060000  
+chr1    895889  896007  7   55.580000   
+chr1    931522  931604  8   61.740000   
+chr1    934975  935068  9   58.460000   
+chr1    935610  935707  10  57.260000   </code></pre>
+</div>
+<div id="interval-file-example" class="section level2">
+<h2>Interval file example</h2>
+<p>Columns are tab-delimited as follows:</p>
+<ol style="list-style-type: decimal">
+<li>chr<br />
+</li>
+<li>start<br />
+</li>
+<li>end<br />
+</li>
+<li>interval name<br />
+</li>
+<li>other descriptive info<br />
+</li>
+<li>strand</li>
+</ol>
+<p>Example:</p>
+<pre class="bash"><code># print first 10 lines of interval file 
+head enh_hues64.bed</code></pre>
+<pre><code>chr1    950170  950421  chr1-38111  1   +
+chr1    959538  959789  chr1-35426  1   +
+chr1    960212  960917  chr1-25728  1   +
+chr1    1240223 1241257 chr1-22005  1   +
+chr1    1293148 1294704 chr1-28991  1   +
+chr1    1295292 1295763 chr1-23110  1   +
+chr1    1342124 1346737 chr1-20034  1   +
+chr1    1356391 1356642 chr1-38124  1   +
+chr1    1365711 1366318 chr1-18291  1   +
+chr1    1367312 1370513 chr1-32930  1   +</code></pre>
+</div>
+</div>
+<div id="enrichacrossintervals-script" class="section level1">
+<h1>enrichAcrossIntervals script</h1>
+<pre class="bash"><code>
+for  i in *.bed
+do
+        ## define variables
+        int_file=interval.bed
+        base=$(basename $i .bed)
+        
+        ## start script
+        echo &quot;Starting countEnrichAcrossInterval&quot;
+        
+        ## print file name being currently run
+        echo &quot;$base&quot;
+        
+        ## sort all bed files
+        sort -k1,1 -k2,2n $i &gt; $base.sort.bed
+        
+        ## intersect peak enrichments with interval file outputting a and b file info
+        intersectBed -a $int_file -b $base.sort.bed -wa -wb &gt; $base.int.bed
+        
+        ## for each interval (e.g. column 1-4), choose the peak enrichment (e.g. column 11) with the highest value
+        bedtools groupby -i $base.int.bed -g 1,2,3,4 -c 11 -o max | sed &#39;s/ /\t/g&#39; | sort -k1,1 -k2,2n &gt; $base.group.bed
+        
+        ## intersect peak enrichments with interval file and print &#39;0&#39; for all intervals that don&#39;t intersect a peak
+        intersectBed -a $int_file -b $base.group.bed -wa -v | awk &#39;{OFS=&quot;\t&quot;}{print $1,$2,$3,$4,0}&#39; &gt; $base.not.bed
+        
+        ## concatenate the intervals overlapping peaks (e.g. $base.group.bed) with the intervals not overlapping peaks (e.g. $base.not.bed)
+        cat $base.group.bed $base.not.bed |sort -k4,4 &gt; $base.enrich.bed
+        
+        ## save file name to be used later as header
+        echo  &quot;$base&quot; &gt; $base.name
+        
+        ## print only the peak enrichment score (e.g. column 5) from $base.enrich.bed
+        awk &#39;{OFS=&quot;\t&quot;}{print $5}&#39; $base.enrich.bed &gt;$base.enrich
+        
+        ## concatenate the header (e.g. $base.name) with the enirchment score file (e.g. $base.enrich)
+        cat $base.name $base.enrich &gt; $base.col
+        
+        ## remove intermediate files
+        rm $base.enrich
+        rm $base.enrich.bed
+        rm $base.group.bed
+        rm $base.int.bed
+        rm $base.name
+        rm $base.not.bed
+        
+        echo &quot;Done.&quot;
+done
+</code></pre>
+</div>
+<div id="verifying-script" class="section level1">
+<h1>Verifying script</h1>
+<div id="paste-all-enrich-files-together" class="section level2">
+<h2>Paste all enrich files together</h2>
+<pre class="bash"><code>paste *.col &gt; master.col</code></pre>
+</div>
+<div id="view-output-file" class="section level2">
+<h2>View output file</h2>
+<pre class="bash"><code>head master.col</code></pre>
+</div>
+<div id="load-libraries-for-r" class="section level2">
+<h2>Load libraries for R</h2>
+<pre class="r"><code>library(ggplot2)
+library(dplyr)
+library(corrplot)</code></pre>
+</div>
+<div id="read-file-into-r" class="section level2">
+<h2>Read file into R</h2>
+<pre class="r"><code>dat &lt;- read.table(&quot;/home/jwoolnough/jess/tf_h64/master.col&quot;, sep=&quot;\t&quot;,header=TRUE)</code></pre>
+</div>
+<div id="plot-correlation" class="section level2">
+<h2>Plot correlation</h2>
+<pre class="r"><code>M &lt;- cor(dat)
+
+colnames(M) &lt;- c(1:54)
+rownames(M) &lt;- c(1:54)
+
+corrplot(M, method=&quot;circle&quot;, order=&quot;hclust&quot;, tl.cex=0.6)</code></pre>
+<p><img src="/post/countsAcrossInterval_files/figure-html/unnamed-chunk-9-1.png" width="672" /> ## Sample Key</p>
+<pre class="r"><code>id &lt;- as.data.frame(colnames(dat))
+names(id) &lt;- c(&quot;Sample Key&quot;)
+
+id</code></pre>
+<pre><code>                        Sample Key
+1                     E016.H3K27ac
+2                    E016.H3K27me3
+3                    E016.H3K36me3
+4                     E016.H3K4me1
+5                     E016.H3K4me3
+6                      E016.H3K9ac
+7                     E016.H3K9me3
+8     GSM1505617_Blimp1_070213_h64
+9       GSM1505620_Ctcf_052212_h64
+10      GSM1505621_Ctcf_110512_h64
+11      GSM1505622_Ctcf_110812_h64
+12     GSM1505627_Eomes_021113_h64
+13     GSM1505633_FoxA1_021113_h64
+14     GSM1505640_FoxA2_070213_h64
+15     GSM1505642_Gata4_021113_h64
+16     GSM1505659_Gata6_062613_h64
+17     GSM1505681_Hnf1b_021113_h64
+18     GSM1505687_Hnf4a_070213_h64
+19     GSM1505693_NR5A2_021113_h64
+20     GSM1505695_Nanog_010212_h64
+21     GSM1505698_Nanog_110112_h64
+22     GSM1505699_Nanog_110512_h64
+23     GSM1505700_Nanog_110812_h64
+24      GSM1505704_Otx2_020912_h64
+25      GSM1505709_Otx2_050114_h64
+26      GSM1505711_Otx2_110512_h64
+27      GSM1505712_Otx2_110812_h64
+28      GSM1505716_Pol2_110512_h64
+29      GSM1505717_Pol2_110812_h64
+30    GSM1505724_Pou5f1_110512_h64
+31    GSM1505725_Pou5f1_110812_h64
+32    GSM1505728_Pou5f1_122811_h64
+33      GSM1505731_Rex1_110812_h64
+34     GSM1505732_Sall4_010212_h64
+35     GSM1505745_Smad1_110812_h64
+36    GSM1505747_Smad23_021113_h64
+37   GSM1505748_Smad23_022813_ecto
+38     GSM1505751_Smad4_021113_h64
+39     GSM1505757_Smad4_070213_h64
+40     GSM1505758_Snai2_021113_h64
+41     GSM1505760_Sox17_021113_h64
+42      GSM1505766_Sox2_110812_h64
+43      GSM1505768_Sox2_122811_h64
+44    GSM1505769_Sp1_cs_021113_h64
+45       GSM1505772_Srf_010212_h64
+46       GSM1505774_Srf_110512_h64
+47  GSM1505781_Stat3_cs_070213_h64
+48         GSM1505782_T_021113_h64
+49      GSM1505785_Tal1_062613_h64
+50      GSM1505791_Tcf4_110812_h64
+51 GSM1505796_Thap11_ab_031313_h64
+52 GSM1505801_Trim28_ab_031313_h64
+53      GSM1505809_cMyc_110812_h64
+54     GSM1505813_eHand_070213_h64</code></pre>
+</div>
+</div>

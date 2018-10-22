@@ -55,7 +55,7 @@ gunzip ncbiRefSeq.txt.gz
 Final order of columns should be: chr, start, end, refseq_id, refseq_id, strand  
   
 Steps:  
-1. print tab-delimited columns 3,5,6,13,13,4  
+1. print tab-delimited columns 3, 5, 6, 13, 13, 4  
 2. sort starting and ending on column 4  
 3. output unique lines only  
 4. save to file  
@@ -172,7 +172,7 @@ First check code to make sure all new IDs created are unique.
   
 Steps:  
 1. join ncbiRefSeq.id.bed based on column 8 with ncbiRefSeq.longest.bed based on column 1  
-2. print tab-delimited column 2,3,4,5,1'_'2'_'3'_'4'_'5'_'6'_'7,7  
+2. print tab-delimited column 2, 3, 4, 5, 1\_2\_3\_4\_5\_6\_7, 7  
 3. print column 5  
 4. output non-unique lines  
 5. count lines  
@@ -298,4 +298,8 @@ wc -l
 
 echo "End of script"
 ### Note: for hg19, only one gene has two lines and this is because the two annotations have different start and end coordinates but are both the same length. To avoid this, change the parameters in the bedtools groupby step to eliminate 'ties' like this.
+```
+
+```{r,include=FALSE}
+servr::daemon_stop("139717500734200")
 ```
