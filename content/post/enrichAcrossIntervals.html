@@ -4,13 +4,17 @@ author: "Jessica L. Woolnough"
 output:
   blogdown::html_page:
     toc: false
-  date: "22 October, 2018"
+  date: "23 October, 2018"
 ---
 
 
 
-<div id="this-script-assigns-peak-enrichments-to-any-set-of-intervals.-this-is-useful-for-summarizing-peak-data-for-many-experiments-across-a-single-set-of-intervals-like-tsss." class="section level3">
-<h3>This script assigns peak enrichments to any set of intervals. This is useful for summarizing peak data for many experiments across a single set of intervals, like TSSs.</h3>
+<div class="figure">
+<img src="/img/enrichAcrossIntervals_plot.png" />
+
+</div>
+<div id="this-script-assigns-pre-calculated-peak-enrichments-to-any-given-set-of-intervals.-this-is-useful-for-summarizing-binding-of-many-factors-across-a-single-set-of-intervals-e.g.summarize-binding-for-39-different-tfshistone-marks-across-select-enhancers." class="section level3">
+<h3>This script assigns pre-calculated peak enrichments to any given set of intervals. This is useful for summarizing binding of many factors across a single set of intervals (e.g. summarize binding for 39 different TFs/histone marks across select enhancers).</h3>
 </div>
 <div id="table-of-contents" class="section level2">
 <h2>Table of Contents</h2>
@@ -23,11 +27,11 @@ output:
 <li><a href="#enrichacrossintervals-script">enrichAcrossIntervals script</a></li>
 <li><a href="#verifying-script">Verifying script</a>
 <ul>
-<li><a href="#paste-all-enrich-files-together">Paste all enrich files together</a></li>
 <li><a href="#view-output-file">View output file</a></li>
 <li><a href="#load-libraries-for-r">Load libraries for R</a></li>
 <li><a href="#read-file-into-r">Read file into R</a></li>
-<li><a href="#plot-correlationsample-key">Plot correlationSample Key</a></li>
+<li><a href="#plot-correlation">Plot correlation</a></li>
+<li><a href="#sample-key-">Sample Key</a></li>
 </ul></li>
 </ul>
 </div>
@@ -147,17 +151,26 @@ do
         
         echo &quot;Done.&quot;
 done
+
+## Paste all enrich files together after the loop has finished
+paste *.col &gt; master.tab
 </code></pre>
 </div>
 <div id="verifying-script" class="section level1">
 <h1>Verifying script</h1>
-<div id="paste-all-enrich-files-together" class="section level2">
-<h2>Paste all enrich files together</h2>
-<pre class="bash"><code>paste *.col &gt; master.col</code></pre>
-</div>
 <div id="view-output-file" class="section level2">
 <h2>View output file</h2>
-<pre class="bash"><code>head master.col</code></pre>
+<pre class="bash"><code>head master.tab</code></pre>
+<pre><code>E016-H3K27ac    E016-H3K27me3   E016-H3K36me3   E016-H3K4me1    E016-H3K4me3    E016-H3K9ac E016-H3K9me3    GSM1505617_Blimp1_070213_h64    GSM1505620_Ctcf_052212_h64  GSM1505627_Eomes_021113_h64 GSM1505633_FoxA1_021113_h64 GSM1505640_FoxA2_070213_h64 GSM1505642_Gata4_021113_h64 GSM1505659_Gata6_062613_h64 GSM1505681_Hnf1b_021113_h64 GSM1505687_Hnf4a_070213_h64 GSM1505693_NR5A2_021113_h64 GSM1505695_Nanog_010212_h64 GSM1505704_Otx2_020912_h64  GSM1505716_Pol2_110512_h64  GSM1505724_Pou5f1_110512_h64    GSM1505731_Rex1_110812_h64  GSM1505732_Sall4_010212_h64 GSM1505745_Smad1_110812_h64 GSM1505747_Smad23_021113_h64    GSM1505751_Smad4_021113_h64 GSM1505758_Snai2_021113_h64 GSM1505760_Sox17_021113_h64 GSM1505766_Sox2_110812_h64  GSM1505769_Sp1_cs_021113_h64    GSM1505772_Srf_010212_h64   GSM1505781_Stat3_cs_070213_h64  GSM1505782_T_021113_h64 GSM1505785_Tal1_062613_h64  GSM1505791_Tcf4_110812_h64  GSM1505796_Thap11_ab_031313_h64 GSM1505801_Trim28_ab_031313_h64 GSM1505809_cMyc_110812_h64  GSM1505813_eHand_070213_h64
+0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   66.18   0   0   0   0   0   0   0   0   0   0   0   3100    0   0   0   0   0   0   120.71  0
+0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   681.96  412.94  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+35  656 0   0   2302    408 0   0   0   0   0   0   75.57   0   0   0   0   0   71  0   0   0   0   0   0   0   0   0   0   50.09   0   0   0   0   0   0   0   91.04   0
+0   66  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   58.04   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+0   0   0   47  0   0   0   0   0   0   0   0   0   0   0   0   0   59.81   232.21  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   73.33   0   0   0   0
+35  0   0   246 0   62  0   0   0   0   0   0   0   0   0   0   0   0   95.25   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+0   42  0   136 0   0   0   0   0   62.01   81.49   51.96   0   0   0   0   0   0   849.72  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+0   50  0   0   0   0   0   0   0   0   154.67  0   0   0   0   0   0   0   127.19  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+0   29  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   184.69  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0</code></pre>
 </div>
 <div id="load-libraries-for-r" class="section level2">
 <h2>Load libraries for R</h2>
@@ -167,22 +180,25 @@ library(corrplot)</code></pre>
 </div>
 <div id="read-file-into-r" class="section level2">
 <h2>Read file into R</h2>
-<pre class="r"><code>dat &lt;- read.table(&quot;/home/jwoolnough/jess/tf_h64/master.col&quot;, sep=&quot;\t&quot;,header=TRUE)</code></pre>
+<pre class="r"><code>dat &lt;- read.table(&quot;/home/jwoolnough/jess/tf_h64/master.tab&quot;, sep=&quot;\t&quot;,header=TRUE)</code></pre>
 </div>
 <div id="plot-correlation" class="section level2">
 <h2>Plot correlation</h2>
 <pre class="r"><code>M &lt;- cor(dat)
 
-colnames(M) &lt;- c(1:54)
-rownames(M) &lt;- c(1:54)
+colnames(M) &lt;- c(1:39)
+rownames(M) &lt;- c(1:39)
 
-corrplot(M, method=&quot;circle&quot;, order=&quot;hclust&quot;, tl.cex=0.6)</code></pre>
-<p><img src="/post/countsAcrossInterval_files/figure-html/unnamed-chunk-9-1.png" width="672" /> ## Sample Key</p>
+corrplot(M, method=&quot;color&quot;, order=&quot;hclust&quot;, tl.cex=0.6,cl.lim=c(-.2,1))</code></pre>
+<p><img src="/post/enrichAcrossIntervals_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+</div>
+<div id="sample-key" class="section level2">
+<h2>Sample Key</h2>
 <pre class="r"><code>id &lt;- as.data.frame(colnames(dat))
-names(id) &lt;- c(&quot;Sample Key&quot;)
+names(id) &lt;- c(&quot;Sample&quot;)
 
 id</code></pre>
-<pre><code>                        Sample Key
+<pre><code>                            Sample
 1                     E016.H3K27ac
 2                    E016.H3K27me3
 3                    E016.H3K36me3
@@ -192,50 +208,35 @@ id</code></pre>
 7                     E016.H3K9me3
 8     GSM1505617_Blimp1_070213_h64
 9       GSM1505620_Ctcf_052212_h64
-10      GSM1505621_Ctcf_110512_h64
-11      GSM1505622_Ctcf_110812_h64
-12     GSM1505627_Eomes_021113_h64
-13     GSM1505633_FoxA1_021113_h64
-14     GSM1505640_FoxA2_070213_h64
-15     GSM1505642_Gata4_021113_h64
-16     GSM1505659_Gata6_062613_h64
-17     GSM1505681_Hnf1b_021113_h64
-18     GSM1505687_Hnf4a_070213_h64
-19     GSM1505693_NR5A2_021113_h64
-20     GSM1505695_Nanog_010212_h64
-21     GSM1505698_Nanog_110112_h64
-22     GSM1505699_Nanog_110512_h64
-23     GSM1505700_Nanog_110812_h64
-24      GSM1505704_Otx2_020912_h64
-25      GSM1505709_Otx2_050114_h64
-26      GSM1505711_Otx2_110512_h64
-27      GSM1505712_Otx2_110812_h64
-28      GSM1505716_Pol2_110512_h64
-29      GSM1505717_Pol2_110812_h64
-30    GSM1505724_Pou5f1_110512_h64
-31    GSM1505725_Pou5f1_110812_h64
-32    GSM1505728_Pou5f1_122811_h64
-33      GSM1505731_Rex1_110812_h64
-34     GSM1505732_Sall4_010212_h64
-35     GSM1505745_Smad1_110812_h64
-36    GSM1505747_Smad23_021113_h64
-37   GSM1505748_Smad23_022813_ecto
-38     GSM1505751_Smad4_021113_h64
-39     GSM1505757_Smad4_070213_h64
-40     GSM1505758_Snai2_021113_h64
-41     GSM1505760_Sox17_021113_h64
-42      GSM1505766_Sox2_110812_h64
-43      GSM1505768_Sox2_122811_h64
-44    GSM1505769_Sp1_cs_021113_h64
-45       GSM1505772_Srf_010212_h64
-46       GSM1505774_Srf_110512_h64
-47  GSM1505781_Stat3_cs_070213_h64
-48         GSM1505782_T_021113_h64
-49      GSM1505785_Tal1_062613_h64
-50      GSM1505791_Tcf4_110812_h64
-51 GSM1505796_Thap11_ab_031313_h64
-52 GSM1505801_Trim28_ab_031313_h64
-53      GSM1505809_cMyc_110812_h64
-54     GSM1505813_eHand_070213_h64</code></pre>
+10     GSM1505627_Eomes_021113_h64
+11     GSM1505633_FoxA1_021113_h64
+12     GSM1505640_FoxA2_070213_h64
+13     GSM1505642_Gata4_021113_h64
+14     GSM1505659_Gata6_062613_h64
+15     GSM1505681_Hnf1b_021113_h64
+16     GSM1505687_Hnf4a_070213_h64
+17     GSM1505693_NR5A2_021113_h64
+18     GSM1505695_Nanog_010212_h64
+19      GSM1505704_Otx2_020912_h64
+20      GSM1505716_Pol2_110512_h64
+21    GSM1505724_Pou5f1_110512_h64
+22      GSM1505731_Rex1_110812_h64
+23     GSM1505732_Sall4_010212_h64
+24     GSM1505745_Smad1_110812_h64
+25    GSM1505747_Smad23_021113_h64
+26     GSM1505751_Smad4_021113_h64
+27     GSM1505758_Snai2_021113_h64
+28     GSM1505760_Sox17_021113_h64
+29      GSM1505766_Sox2_110812_h64
+30    GSM1505769_Sp1_cs_021113_h64
+31       GSM1505772_Srf_010212_h64
+32  GSM1505781_Stat3_cs_070213_h64
+33         GSM1505782_T_021113_h64
+34      GSM1505785_Tal1_062613_h64
+35      GSM1505791_Tcf4_110812_h64
+36 GSM1505796_Thap11_ab_031313_h64
+37 GSM1505801_Trim28_ab_031313_h64
+38      GSM1505809_cMyc_110812_h64
+39     GSM1505813_eHand_070213_h64</code></pre>
 </div>
 </div>

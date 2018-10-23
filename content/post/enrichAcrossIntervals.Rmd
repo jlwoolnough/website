@@ -14,12 +14,14 @@ devtools::source_gist("c83e078bf8c81b035e32c3fc0cf04ee8",
                       filename = 'render_toc.R')
 ```
 
-### This script assigns peak enrichments to any set of intervals. This is useful for summarizing peak data for many experiments across a single set of intervals, like TSSs.
+![](/img/enrichAcrossIntervals_plot.png)
+
+### This script assigns pre-calculated peak enrichments to any given set of intervals. This is useful for summarizing binding of many factors across a single set of intervals (e.g. summarize binding for 39 different TFs/histone marks across select enhancers).
 
 ## Table of Contents
 
 ```{r toc, echo=FALSE}
-render_toc(filename = "/jess/GitHub/website/content/post/countsAcrossInterval.Rmd")
+render_toc(filename = "/jess/GitHub/website/content/post/enrichAcrossIntervals.Rmd")
 ```
 
 # Introduction
@@ -115,17 +117,16 @@ do
         echo "Done."
 done
 
+## Paste all enrich files together after the loop has finished
+paste *.col > master.tab
+
 ```
 
 # Verifying script
-## Paste all enrich files together
-```{bash, eval=FALSE}
-paste *.col > master.col
-```
 
 ## View output file
-```{bash,eval=FALSE}
-head master.col
+```{bash, comment=NA}
+head master.tab
 ```
 
 
@@ -138,7 +139,7 @@ library(corrplot)
 
 ## Read file into R
 ```{r}
-dat <- read.table("/home/jwoolnough/jess/tf_h64/master.col", sep="\t",header=TRUE)
+dat <- read.table("/home/jwoolnough/jess/tf_h64/master.tab", sep="\t",header=TRUE)
 ```
 
 ```{r,include=FALSE}
@@ -149,16 +150,16 @@ dat$X <- NULL
 ```{r}
 M <- cor(dat)
 
-colnames(M) <- c(1:54)
-rownames(M) <- c(1:54)
+colnames(M) <- c(1:39)
+rownames(M) <- c(1:39)
 
-corrplot(M, method="circle", order="hclust", tl.cex=0.6)
-
+corrplot(M, method="color", order="hclust", tl.cex=0.6,cl.lim=c(-.2,1))
 ```
-## Sample Key
+
+## Sample Key  
 ```{r,comment=NA}
 id <- as.data.frame(colnames(dat))
-names(id) <- c("Sample Key")
+names(id) <- c("Sample")
 
 id
 ```
