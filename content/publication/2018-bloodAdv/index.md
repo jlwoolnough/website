@@ -15,11 +15,11 @@ authors = ["Chu SH", "Song EJ","Chabon JR","Minehart J", "Matovina CN", "Makofsk
 # 4 = Report
 # 5 = Book
 # 6 = Book section
-publication_types = ["1"]
+publication_types = ["2"]
 
 # Publication name and optional abbreviated version.
 publication = "In *Blood Advances*"
-publication_short = "In *ICMEW*"
+publication_short = "In *Blood Adv*"
 
 # Abstract and optional shortened version.
 abstract = "Infant B-cell acute lymphoblastic leukemias (B-ALLs) that harbor MLL-AF4 rearrangements are associated with a poor prognosis. One important obstacle to progress for this patient population is the lack of immunocompetent models that faithfully recapitulate the short latency and aggressiveness of this disease. Recent whole-genome sequencing of MLL-AF4 B-ALL samples revealed a high frequency of activating RAS mutations; however, single-agent targeting of downstream effectors of the RAS pathway in these mutated MLL-r B-ALLs has demonstrated limited and nondurable antileukemic effects. Here, we demonstrate that the expression of activating mutant N-Ras G12D cooperates with Mll-Af4 to generate a highly aggressive serially transplantable B-ALL in mice. We used our novel mouse model to test the sensitivity of Mll-Af4/N-Ras G12D leukemia to small molecule inhibitors and found potent and synergistic preclinical efficacy of dual targeting of the Mek and Atr pathways in mouse- and patient-derived xenografts with both mutations in vivo, suggesting this combination as an attractive therapeutic opportunity that might be used to treat patients with these mutations. Our studies indicate that this mouse model of Mll-Af4/N-Ras B-ALL is a powerful tool to explore the molecular and genetic pathogenesis of this disease subtype, as well as a preclinical discovery platform for novel therapeutic strategies."
@@ -56,11 +56,11 @@ math = true
 # To use, add an image named `featured.jpg/png` to your page's folder. 
 [image]
   # Caption (optional)
-  caption = "Image credit: [**Unsplash**](https://unsplash.com/photos/pLCdAaMFLTE)"
+  # caption = "Image credit: [**Unsplash**](https://unsplash.com/photos/pLCdAaMFLTE)"
 
   # Focal point (optional)
   # Options: Smart, Center, TopLeft, Top, TopRight, Left, Right, BottomLeft, Bottom, BottomRight
   focal_point = ""
 +++
 
-More detail can easily be written here using *Markdown* and $\rm \LaTeX$ math code.
+# More detail can easily be written here using *Markdown* and $\rm \LaTeX$ math code.
