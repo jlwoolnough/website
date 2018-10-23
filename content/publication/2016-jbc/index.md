@@ -63,4 +63,3 @@ doi = "10.1074/jbc.M116.725051"
   focal_point = ""
 +++
 
-# More detail can easily be written here using *Markdown* and $\rm \LaTeX$ math code.

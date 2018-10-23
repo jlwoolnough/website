@@ -62,5 +62,3 @@ doi = "10.1371/journal.pone.0157276"
   # Options: Smart, Center, TopLeft, Top, TopRight, Left, Right, BottomLeft, Bottom, BottomRight
   focal_point = ""
 +++
-
-# More detail can easily be written here using *Markdown* and $\rm \LaTeX$ math code.
