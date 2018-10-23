@@ -1,10 +1,10 @@
 +++
-title = "Mobile visual clothing search"
-date = 2013-07-01T00:00:00
+title = "Inhibition of MEK and ATR is effective in a B-cell acute lymphoblastic leukemia model driven by Mll-Af4 and activated Ras."
+date = 2018-10-09T00:00:00
 draft = false
 
 # Authors. Comma separated list, e.g. `["Bob Smith", "David Jones"]`.
-authors = ["GA Cushen", "MS Nixon"]
+authors = ["Chu SH", "Song EJ","Chabon JR","Minehart J", "Matovina CN", "Makofske JL", "Frank ES", "Ross K", "Koche RP", "Feng Z", "Xu H", "Krivstov A", "Nussenzweig A", "Armstrong SA"]
 
 # Publication type.
 # Legend:
@@ -18,12 +18,11 @@ authors = ["GA Cushen", "MS Nixon"]
 publication_types = ["1"]
 
 # Publication name and optional abbreviated version.
-publication = "In *International Conference on Multimedia and Expo Workshops (ICMEW)*, IEEE."
+publication = "In *Blood Advances*"
 publication_short = "In *ICMEW*"
 
 # Abstract and optional shortened version.
-abstract = "We present a mobile visual clothing search system whereby a smart phone user can either choose a social networking photo or take a new photo of a person wearing clothing of interest and search for similar clothing in a retail database. From the query image, the person is detected, clothing is segmented, and clothing features are extracted and quantized. The information is sent from the phone client to a server, where the feature vector of the query image is used to retrieve similar clothing products from online databases. The phone's GPS location is used to re-rank results by retail store location. State of the art work focuses primarily on the recognition of a diverse range of clothing offline and pays little attention to practical applications. Evaluated on a challenging dataset, the system is relatively fast and achieves promising results."
-abstract_short = "A mobile visual clothing search system is presented whereby a smart phone user can either choose a social networking image or capture a new photo of a person wearing clothing of interest and search for similar clothing in a large cloud-based ecommerce database. The phone's GPS location is used to re-rank results by retail store location, to inform the user of local stores where similar clothing items can be tried on."
+abstract = "Infant B-cell acute lymphoblastic leukemias (B-ALLs) that harbor MLL-AF4 rearrangements are associated with a poor prognosis. One important obstacle to progress for this patient population is the lack of immunocompetent models that faithfully recapitulate the short latency and aggressiveness of this disease. Recent whole-genome sequencing of MLL-AF4 B-ALL samples revealed a high frequency of activating RAS mutations; however, single-agent targeting of downstream effectors of the RAS pathway in these mutated MLL-r B-ALLs has demonstrated limited and nondurable antileukemic effects. Here, we demonstrate that the expression of activating mutant N-Ras G12D cooperates with Mll-Af4 to generate a highly aggressive serially transplantable B-ALL in mice. We used our novel mouse model to test the sensitivity of Mll-Af4/N-Ras G12D leukemia to small molecule inhibitors and found potent and synergistic preclinical efficacy of dual targeting of the Mek and Atr pathways in mouse- and patient-derived xenografts with both mutations in vivo, suggesting this combination as an attractive therapeutic opportunity that might be used to treat patients with these mutations. Our studies indicate that this mouse model of Mll-Af4/N-Ras B-ALL is a powerful tool to explore the molecular and genetic pathogenesis of this disease subtype, as well as a preclinical discovery platform for novel therapeutic strategies."
 
 # Is this a selected publication? (true/false)
 selected = true
@@ -34,29 +33,21 @@ selected = true
 #   E.g. `projects = ["deep-learning"]` references 
 #   `content/project/deep-learning/index.md`.
 #   Otherwise, set `projects = []`.
-projects = ["internal-project"]
+projects = []
 
 # Tags (optional).
 #   Set `tags = []` for no tags, or use the form `tags = ["A Tag", "Another Tag"]` for one or more tags.
-tags = []
+tags = ["Leukemia","B-cell","MLL-AF4"]
 
 # Links (optional).
-url_pdf = "http://eprints.soton.ac.uk/352095/1/Cushen-IMV2013.pdf"
-url_preprint = "http://eprints.soton.ac.uk/352095/1/Cushen-IMV2013.pdf"
-url_code = "#"
-url_dataset = "#"
-url_project = "#"
-url_slides = "#"
-url_video = "#"
-url_poster = "#"
-url_source = "#"
+url_pdf = "http://www.bloodadvances.org/content/bloodoa/2/19/2478.full.pdf"
 
 # Custom links (optional).
 #   Uncomment line below to enable. For multiple links, use the form `[{...}, {...}, {...}]`.
-url_custom = [{name = "Custom Link", url = "http://example.org"}]
+url_custom = [{name = "PubMed", url = "https://www.ncbi.nlm.nih.gov/pubmed/30266823"}]
 
 # Digital Object Identifier (DOI)
-doi = ""
+doi = "10.1182/bloodadvances.2018021592"
 
 # Does this page contain LaTeX math? (true/false)
 math = true
