@@ -47,7 +47,7 @@ tags = ["Pseudomonas aeruginosa","Cystic Fibrosis","Microbial adaptation", "Glyc
 url_custom = [{name = "PubMed", url = "https://www.ncbi.nlm.nih.gov/pubmed/25409940"}]
 
 # Digital Object Identifier (DOI)
-doi = "10.1139/cjm-2014-0485."
+doi = "10.1139/cjm-2014-0485"
 
 # Does this page contain LaTeX math? (true/false)
 math = true

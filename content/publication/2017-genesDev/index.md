@@ -42,7 +42,7 @@ projects = []
 tags = ["BioTAP-XL","Bivalent","Chromatin", "Polycomb", "MOZ", "BRD4"]
 
 # Links (optional).
-url_pdf = "http://www.bloodadvances.org/content/bloodoa/2/19/2478.full.pdf"
+url_pdf = "http://genesdev.cshlp.org/content/31/19/1988.full.pdf"
 
 # Custom links (optional).
 #   Uncomment line below to enable. For multiple links, use the form `[{...}, {...}, {...}]`.
