@@ -4,7 +4,7 @@ author: "Jessica L. Woolnough"
 output:
   blogdown::html_page:
     toc: false
-  date: "19 October, 2018"
+  date: "25 October, 2018"
 ---
 
 
@@ -15,25 +15,28 @@ output:
 <img src="/img/collapseToGene.png" />
 
 </div>
+<p><br> <br></p>
 </div>
 <div id="table-of-contents" class="section level2">
 <h2>Table of Contents</h2>
 <ul>
-<li><a href="#introduction">Introduction</a></li>
-<li><a href="#step-by-step">Step-by-step</a>
+<li><a href="#introduction-">Introduction</a>
 <ul>
-<li><a href="#download-refseq-coordinate-file">Download RefSeq coordinate file</a></li>
-<li><a href="#unzip-file">Unzip file</a></li>
-<li><a href="#manipulate-to-bed-format">Manipulate to bed format</a></li>
-<li><a href="#create-list-of-chromosomes-of-interest">Create list of chromosomes of interest</a></li>
-<li><a href="#select-chromosomes-of-interest">Select chromosomes of interest</a></li>
-<li><a href="#create-a-unique-identifier-based-on-gene-length">Create a unique identifier based on gene length</a></li>
-<li><a href="#select-annotation-with-longest-transcribed-sequence">Select annotation with longest transcribed sequence</a></li>
-<li><a href="#join-files-based-on-unique-identifier">Join files based on unique identifier</a></li>
-<li><a href="#check-that-only-one-line-per-gene-namenote:-for-hg19,-only-one-gene-has-two-lines-and-this-is-because-the-two-annotations-have-different-start-and-end-coordinates-but-are-both-the-same-length.-to-avoid-this,-change-the-parameters-in-the-bedtools-groupby-step-to-eliminate-&#39;ties&#39;-like-this.">check that only one line per gene nameNote: for hg19, only one gene has two lines and this is because the two annotations have different start and end coordinates but are both the same length. To avoid this, change the parameters in the bedtools groupby step to eliminate ‘ties’ like this.</a></li>
+<li><a href="#peak-enrichment-file-example">Peak enrichment file example</a></li>
+<li><a href="#interval-file-example">Interval file example</a></li>
 </ul></li>
-<li><a href="#streamlined-code">Streamlined code</a></li>
+<li><a href="#enrichacrossintervals-script%3Cbr%3E">enrichAcrossIntervals script<br></a></li>
+<li><a href="#verifying-script">Verifying script</a>
+<ul>
+<li><a href="#view-output-file%3Cbr%3E">View output file<br></a></li>
+<li><a href="#load-libraries-for-r">Load libraries for R</a></li>
+<li><a href="#read-file-into-r">Read file into R</a></li>
+<li><a href="#plot-as-correlation">Plot as correlation</a></li>
+<li><a href="#plot-as-heatmap-">Plot as heatmap</a></li>
+<li><a href="#sample-key-">Sample Key</a></li>
+</ul></li>
 </ul>
+<p><br> <br></p>
 </div>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
@@ -47,18 +50,21 @@ output:
 </li>
 <li><strong>Streamlined code:</strong> continuous code without detailed explanations. Be careful! Try “step-by-step” first.</li>
 </ul>
-<p><em>Note: uses Linux/UNIX commands and <a href="https://bedtools.readthedocs.io/en/latest/">bedtools</a></em></p>
+<p><em>Note: uses Linux/UNIX commands and <a href="https://bedtools.readthedocs.io/en/latest/">bedtools</a></em> <br> <br></p>
 </div>
 <div id="step-by-step" class="section level1">
 <h1>Step-by-step</h1>
+<p><br> <br></p>
 <div id="download-refseq-coordinate-file" class="section level2">
 <h2>Download RefSeq coordinate file</h2>
 <p>Using UCSC GoldenPath database, download the ‘ncbiRefSeq.txt.gz’ gene coordinate file</p>
 <pre class="bash"><code>wget ftp://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/ncbiRefSeq.txt.gz</code></pre>
+<p><br> <br></p>
 </div>
 <div id="unzip-file" class="section level2">
 <h2>Unzip file</h2>
 <pre class="bash"><code>gunzip ncbiRefSeq.txt.gz</code></pre>
+<p><br> <br></p>
 </div>
 <div id="manipulate-to-bed-format" class="section level2">
 <h2>Manipulate to bed format</h2>
@@ -72,6 +78,7 @@ output:
 <pre class="bash"><code>awk &#39;{OFS=&quot;\t&quot;}{print $3,$5,$6,$13,$13,$4}&#39; ncbiRefSeq.txt | \
 sort -k 4,4 | \
 uniq &gt; ncbiRefSeq.bed </code></pre>
+<p><br> <br></p>
 </div>
 <div id="create-list-of-chromosomes-of-interest" class="section level2">
 <h2>Create list of chromosomes of interest</h2>
@@ -83,6 +90,7 @@ uniq &gt; ncbiRefSeq.bed </code></pre>
 <p>Code:</p>
 <pre class="bash"><code>printf &quot;chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY&quot; | \
 sed &#39;s/,/\n/g&#39; &gt; chr_list.txt</code></pre>
+<p><br> <br></p>
 </div>
 <div id="select-chromosomes-of-interest" class="section level2">
 <h2>Select chromosomes of interest</h2>
@@ -104,6 +112,7 @@ done
 
 cat *.tmp &gt; ncbiRefSeq.chr.bed
 rm *.tmp</code></pre>
+<p><br> <br></p>
 </div>
 <div id="create-a-unique-identifier-based-on-gene-length" class="section level2">
 <h2>Create a unique identifier based on gene length</h2>
@@ -117,6 +126,7 @@ rm *.tmp</code></pre>
 <pre class="bash"><code>awk &#39;{OFS=&quot;\t&quot;}{print $0,$3-$2}&#39; ncbiRefSeq.chr.bed | \
 awk &#39;{OFS=&quot;\t&quot;}{print $0,$4&quot;_&quot;$7}&#39; | \
 sort -k 4,4 &gt; ncbiRefSeq.id.bed</code></pre>
+<p><br> <br></p>
 </div>
 <div id="select-annotation-with-longest-transcribed-sequence" class="section level2">
 <h2>Select annotation with longest transcribed sequence</h2>
@@ -147,6 +157,7 @@ sort -k 1,1 &gt; ncbiRefSeq.longest.bed</code></pre>
 <p>Sort ncbiRefSeq.id.bed starting and ending with column 8</p>
 <pre class="bash"><code>sort -k 8,8 ncbiRefSeq.id.bed &gt; tmp
 mv tmp ncbiRefSeq.id.bed</code></pre>
+<p><br> <br></p>
 </div>
 <div id="join-files-based-on-unique-identifier" class="section level2">
 <h2>Join files based on unique identifier</h2>
@@ -171,6 +182,7 @@ wc -l</code></pre>
 <pre class="bash"><code>join -1 8 -2 1 ncbiRefSeq.id.bed ncbiRefSeq.longest.bed | \
 awk &#39;{OFS=&quot;\t&quot;}{print $2,$3,$4,$5,$1&quot;_&quot;$2&quot;_&quot;$3&quot;_&quot;$4&quot;_&quot;$7,$7}&#39; | \
 sort -k 1,1 &gt; gene.ncbiRefSeq.longest.bed</code></pre>
+<p><br> <br></p>
 </div>
 <div id="check-that-only-one-line-per-gene-name" class="section level2">
 <h2>check that only one line per gene name</h2>
@@ -179,6 +191,7 @@ uniq -d | \
 wc -l</code></pre>
 <pre><code>## 1</code></pre>
 <p>Note: for hg19, only one gene has two lines and this is because the two annotations have different start and end coordinates but are both the same length. To avoid this, change the parameters in the bedtools groupby step to eliminate ‘ties’ like this.</p>
+<p><br> <br></p>
 </div>
 </div>
 <div id="streamlined-code" class="section level1">

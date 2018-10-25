@@ -10,21 +10,24 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = '/home/jwoolnough/jess/working/')
-devtools::source_gist("c83e078bf8c81b035e32c3fc0cf04ee8", 
-                      filename = 'render_toc.R')
 ```
 
 ### This script collapses a list with multiple transcripts per 'gene' to a list with only a single entry per unique TSS. This is useful to create the coordinate file needed to generate heatmaps or metagene plots across TSSs, because there is only one entry per TSS.  
 ![](/img/collapseToGene.png)  
 
+<br>
+<br>  
 
 
 ## Table of Contents
 
 ```{r toc, echo=FALSE}
-render_toc(filename = "/jess/GitHub/website/content/post/collapseToGene.Rmd")
+render_toc <- dget("/jess/render_toc.R")
+render_toc(filename = "/jess/GitHub/website/content/post/enrichAcrossIntervals.Rmd")
 ```
 
+<br>
+<br>  
 
 # Introduction
 
@@ -36,8 +39,12 @@ This script collapses a list containing multiple transcript coordinates per 'gen
 * **Streamlined code:** continuous code without detailed explanations. Be careful! Try "step-by-step" first.  
   
 _Note: uses Linux/UNIX commands and [bedtools](https://bedtools.readthedocs.io/en/latest/)_
+<br>
+<br>  
 
 # Step-by-step
+<br>
+<br>  
 
 ## Download RefSeq coordinate file
 Using UCSC GoldenPath database, download the 'ncbiRefSeq.txt.gz' gene coordinate file  
@@ -45,11 +52,16 @@ Using UCSC GoldenPath database, download the 'ncbiRefSeq.txt.gz' gene coordinate
 wget ftp://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/ncbiRefSeq.txt.gz
 ```
 
+<br>
+<br>  
+
 ## Unzip file
 ```{bash, eval=FALSE}
 gunzip ncbiRefSeq.txt.gz
 ```
 
+<br>
+<br>  
 
 ## Manipulate to bed format
 Final order of columns should be: chr, start, end, refseq_id, refseq_id, strand  
@@ -67,6 +79,8 @@ sort -k 4,4 | \
 uniq > ncbiRefSeq.bed 
 ```
 
+<br>
+<br>  
 
 ## Create list of chromosomes of interest
 Create a newline separated list of the chromosome names of interest. Often non-standard chromosomes are included in these gene lists and can lead to redundancy. You can create this list however you like. Here is one way to do it.  
@@ -82,6 +96,8 @@ printf "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr
 sed 's/,/\n/g' > chr_list.txt
 ```
 
+<br>
+<br>  
 
 ## Select chromosomes of interest
   
@@ -107,6 +123,8 @@ cat *.tmp > ncbiRefSeq.chr.bed
 rm *.tmp
 ```
 
+<br>
+<br>  
 
 ## Create a unique identifier based on gene length
 Calculate the length of each gene and then join gene name and gene length to create a unique identifier.  
@@ -123,6 +141,9 @@ awk '{OFS="\t"}{print $0,$3-$2}' ncbiRefSeq.chr.bed | \
 awk '{OFS="\t"}{print $0,$4"_"$7}' | \
 sort -k 4,4 > ncbiRefSeq.id.bed
 ```
+
+<br>
+<br>  
 
 ## Select annotation with longest transcribed sequence
 First check that your code will only leave unique gene names.  
@@ -164,6 +185,9 @@ Sort ncbiRefSeq.id.bed starting and ending with column 8
 sort -k 8,8 ncbiRefSeq.id.bed > tmp
 mv tmp ncbiRefSeq.id.bed
 ```
+
+<br>
+<br>  
   
 ## Join files based on unique identifier
 Join the ncbiRefSeq.longest.bed with the ncbiRefSeq.id.bed based on unique identifier. Also, make new identifier that contains all the information from the line, put in column 5  
@@ -196,6 +220,9 @@ awk '{OFS="\t"}{print $2,$3,$4,$5,$1"_"$2"_"$3"_"$4"_"$7,$7}' | \
 sort -k 1,1 > gene.ncbiRefSeq.longest.bed
 ```
 
+<br>
+<br>  
+
 ## check that only one line per gene name
 ```{bash}
 awk '{print $4}' gene.ncbiRefSeq.longest.bed | \
@@ -204,6 +231,9 @@ wc -l
 ```
 Note: for hg19, only one gene has two lines and this is because the two annotations have different start and end coordinates but are both the same length. To avoid this, change the parameters in the bedtools groupby step to eliminate 'ties' like this.
 
+
+<br>
+<br>  
 
 # Streamlined code
 ```{bash, eval=FALSE}
@@ -298,8 +328,4 @@ wc -l
 
 echo "End of script"
 ### Note: for hg19, only one gene has two lines and this is because the two annotations have different start and end coordinates but are both the same length. To avoid this, change the parameters in the bedtools groupby step to eliminate 'ties' like this.
-```
-
-```{r,include=FALSE}
-servr::daemon_stop("139717500734200")
 ```
